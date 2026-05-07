@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PropTrust — Product Validation Survey</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #1D9E75;
+    --green-light: #E1F5EE;
+    --green-mid: #9FE1CB;
+    --green-dark: #0F6E56;
+    --green-deep: #085041;
+    --text: #1a1a1a;
+    --text-muted: #6b7280;
+    --border: rgba(0,0,0,0.1);
+    --bg: #fafaf8;
+    --white: #ffffff;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* Header */
+  .header {
+    background: var(--green-deep);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--green);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-mark svg { width: 20px; height: 20px; }
+
+  .logo-text {
+    font-family: var(--serif);
+    font-size: 22px;
+    color: white;
+    letter-spacing: -0.02em;
+  }
+
+  .logo-text span { color: var(--green-mid); }
+
+  /* Progress bar */
+  .progress-wrap {
+    background: var(--green-deep);
+    padding: 0 2rem 1.25rem;
+  }
+
+  .progress-track {
+    height: 3px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+  }
+
+  .progress-fill {
+    height: 3px;
+    background: var(--green-mid);
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  /* Hero intro */
+  .intro {
+    background: var(--green-deep);
+    padding: 3rem 2rem 4rem;
+    text-align: center;
+    min-height: 100vh;
+  }
+
+  .intro h1 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 5vw, 42px);
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .intro h1 em { color: var(--green-mid); font-style: italic; }
+
+  .intro p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.7);
+    max-width: 480px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+
+  .start-btn {
+    display: inline-block;
+    background: var(--green);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 40px;
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .start-btn:hover { background: #159467; transform: translateY(-1px); }
+
+  .time-note {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 1rem;
+  }
+
+  /* Survey container */
+  .survey-wrap {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+
+  /* Steps */
+  .step { display: none; animation: fadeUp 0.35s ease; }
+  .step.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-badge {
+    display: inline-block;
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+
+  .q-num {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .q-title {
+    font-family: var(--serif);
+    font-size: clamp(20px, 3.5vw, 26px);
+    line-height: 1.35;
+    color: var(--text);
+    margin-bottom: 0.6rem;
+  }
+
+  .q-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.65;
+    margin-bottom: 1.75rem;
+  }
+
+  /* Options */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--white);
+  }
+
+  .opt:hover { border-color: var(--green); background: var(--green-light); }
+  .opt.selected { border-color: var(--green); background: var(--green-light); }
+
+  .opt input[type=radio],
+  .opt input[type=checkbox] {
+    margin-top: 2px;
+    accent-color: var(--green);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .opt label {
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    line-height: 1.55;
+  }
+
+  /* Scale */
+  .scale-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  @media (max-width: 480px) {
+    .scale-grid { grid-template-columns: repeat(5, 1fr); }
+  }
+
+  .scale-btn {
+    aspect-ratio: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--white);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    font-family: var(--sans);
+  }
+
+  .scale-btn:hover, .scale-btn.selected {
+    border-color: var(--green);
+    background: var(--green-light);
+    color: var(--green-dark);
+  }
+
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+
+  .scale-labels span { font-size: 12px; color: var(--text-muted); }
+
+  /* Textarea */
+  textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: var(--sans);
+    color: var(--text);
+    background: var(--white);
+    resize: vertical;
+    transition: border-color 0.15s;
+    line-height: 1.6;
+  }
+
+  textarea:focus { outline: none; border-color: var(--green); }
+  textarea::placeholder { color: #b0b7c0; }
+
+  /* Nav */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-back {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 40px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-family: var(--sans);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    visibility: hidden;
+  }
+
+  .btn-back:hover { border-color: var(--text-muted); color: var(--text); }
+
+  .btn-next {
+    background: var(--green);
+    border: none;
+    border-radius: 40px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: var(--sans);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: auto;
+  }
+
+  .btn-next:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+  .step-indicator {
+    font-size: 13px;
+    color: var(--text-muted);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .nav-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  /* Done screen */
+  .done-screen { text-align: center; padding: 1rem 0; }
+
+  .done-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+
+  .done-icon svg { width: 28px; height: 28px; stroke: var(--green); fill: none; stroke-width: 2.5; }
+
+  .done-screen h2 {
+    font-family: var(--serif);
+    font-size: 30px;
+    margin-bottom: 0.5rem;
+  }
+
+  .done-screen p {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  /* Results */
+  .results-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: left;
+    margin-bottom: 1.5rem;
+  }
+
+  .results-title {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--green-dark);
+    margin-bottom: 1.25rem;
+  }
+
+  .result-row {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-row:last-child { border-bottom: none; }
+
+  .result-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .result-val {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  .tag {
+    display: inline-block;
+    background: var(--green-light);
+    color: var(--green-dark);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 12px;
+    margin: 2px 2px 2px 0;
+  }
+
+  .score-big {
+    font-family: var(--serif);
+    font-size: 28px;
+    color: var(--green);
+  }
+
+  .copy-btn {
+    background: var(--green-deep);
+    color: white;
+    border: none;
+    border-radius: 40px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: var(--sans);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 12px;
+  }
+
+  .copy-btn:hover { background: var(--green-dark); }
+
+  .restart-btn {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 40px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-family: var(--sans);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .restart-btn:hover { border-color: var(--text-muted); color: var(--text); }
+
+  /* Intro screen */
+  #intro-screen { display: block; }
+  #survey-screen { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo-mark">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+  </div>
+  <div class="logo-text">Prop<span>Trust</span></div>
+</div>
+
+<!-- Intro Screen -->
+<div id="intro-screen">
+  <div class="intro">
+    <h1>Help us build something <em>Nigeria needs.</em></h1>
+    <p style="marginBottom "1px">We're building a platform to make property transactions in Nigeria safer. Your honest opinion — good or bad — will help us get it right.</p>
+    <button class="start-btn" onclick="startSurvey()">Start survey →</button>
+    <p class="time-note">Takes about 3–4 minutes · 9 questions · Anonymous</p>
+  </div>
+</div>
+
+<!-- Survey Screen -->
+<div id="survey-screen">
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-fill" id="prog"></div>
+    </div>
+  </div>
+
+  <div class="survey-wrap">
+
+    <!-- Q1 -->
+    <div class="step active" id="s1">
+      <div class="section-badge">Background</div>
+      <p class="q-title">Have you ever bought, sold, or tried to buy property in Nigeria?</p>
+      <p class="q-sub">This could be land, a house, an apartment — anything.</p>
+      <div class="options">
+        <div class="opt" onclick="pick(this,'q1','Yes, I have bought or sold property before')">
+          <input type="radio" name="q1"><label>Yes, I've bought or sold property before</label>
+        </div>
+        <div class="opt" onclick="pick(this,'q1','I tried but it didn\'t work out')">
+          <input type="radio" name="q1"><label>I tried but it didn't work out</label>
+        </div>
+        <div class="opt" onclick="pick(this,'q1','I\'m planning to in the future')">
+          <input type="radio" name="q1"><label>I'm planning to in the future</label>
+        </div>
+        <div class="opt" onclick="pick(this,'q1','No, not yet')">
+          <input type="radio" name="q1"><label>No, not yet</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="step" id="s2">
+      <div class="section-badge">Awareness</div>
+      <p class="q-title">How worried are you about property fraud when buying in Nigeria?</p>
+      <p class="q-sub">Things like fake title documents, selling the same land to multiple people, or agents disappearing with deposits.</p>
+      <div class="scale-grid" id="q2scale"></div>
+      <div class="scale-labels"><span>Not worried at all</span><span>Extremely worried</span></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="step" id="s3">
+      <div class="section-badge">Awareness</div>
+      <p class="q-title">Have you or anyone close to you ever been affected by property fraud?</p>
+      <div class="options">
+        <div class="opt" onclick="pick(this,'q3','Yes, it happened to me directly')">
+          <input type="radio" name="q3"><label>Yes, it happened to me directly</label>
+        </div>
+        <div class="opt" onclick="pick(this,'q3','Yes, someone I know was affected')">
+          <input type="radio" name="q3"><label>Yes, someone I know was affected</label>
+        </div>
+        <div class="opt" onclick="pick(this,'q3','I\'ve heard about it but don\'t know anyone directly')">
+          <input type="radio" name="q3"><label>I've heard about it but don't know anyone directly</label>
+        </div>
+        <div class="opt" onclick="pick(this,'q3','No, never')">
+          <input type="radio" name="q3"><label>No, never</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="step" id="s4">
+      <div class="section-badge">Concept reaction</div>
+      <p class="q-title">Imagine this: a platform holds your money safely while lawyers verify the property documents. Only when everything checks out does the seller receive payment. If anything fails, you get your money back in full.</p>
+      <p class="q-sub">How useful does this sound to you?</p>
+      <div class="scale-grid" id="q4scale"></div>
+      <div class="scale-labels"><span>Not useful at all</span><span>Extremely useful</span></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="step" id="s5">
+      <div class="section-badge">Concept reaction</div>
+      <p class="q-title">What would stop you from using a platform like this?</p>
+      <p class="q-sub">Select all that apply.</p>
+      <div class="options">
+        <div class="opt" onclick="multipick(this,'q5','I wouldn\'t trust a new platform with that much money')">
+          <input type="checkbox"><label>I wouldn't trust a new platform with that much money</label>
+        </div>
+        <div class="opt" onclick="multipick(this,'q5','I\'d rather use a lawyer I already know')">
+          <input type="checkbox"><label>I'd rather use a lawyer I already know</label>
+        </div>
+        <div class="opt" onclick="multipick(this,'q5','The fee (1–1.5% of the deal) feels too high')">
+          <input type="checkbox"><label>The fee (1–1.5% of the deal) feels too high</label>
+        </div>
+        <div class="opt" onclick="multipick(this,'q5','It would slow down the deal too much')">
+          <input type="checkbox"><label>It would slow down the deal too much</label>
+        </div>
+        <div class="opt" onclick="multipick(this,'q5','I don\'t think this problem affects me personally')">
+          <input type="checkbox"><label>I don't think this problem affects me personally</label>
+        </div>
+        <div class="opt" onclick="multipick(this,'q5','Nothing — I would use it')">
+          <input type="checkbox"><label>Nothing — I would use it</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="step" id="s6">
+      <div class="section-badge">Willingness to pay</div>
+      <p class="q-title">If you were buying a ₦50M property, how much would you be willing to pay for full document verification and secure escrow?</p>
+      <div class="options">
+        <div class="opt" onclick="pick(this,'q6','Nothing — this should be free or the seller should pay')">
+          <input type="radio" name="q6"><label>Nothing — this should be free or the seller should pay</label>
+        </div>
+        <div class="opt" onclick="pick(this,'q6','Up to ₦100,000')">
+          <input type="radio" name="q6"><label>Up to ₦100,000</label>
+        </div>
+        <div class="opt" onclick="pick(this,'q6','Up to ₦250,000 (0.5% of deal)')">
+          <input type="radio" name="q6"><label>Up to ₦250,000 (0.5% of deal)</label>
+        </div>
+        <div class="opt" onclick="pick(this,'q6','Up to ₦625,000 (1.25% of deal)')">
+          <input type="radio" name="q6"><label>Up to ₦625,000 (1.25% of deal)</label>
+        </div>
+        <div class="opt" onclick="pick(this,'q6','More than ₦625,000 for the right service')">
+          <input type="radio" name="q6"><label>More than ₦625,000 for the right service</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="step" id="s7">
+      <div class="section-badge">Trust signals</div>
+      <p class="q-title">What would make you trust a platform like this?</p>
+      <p class="q-sub">Select your top choices.</p>
+      <div class="options">
+        <div class="opt" onclick="multipick(this,'q7','Knowing exactly which bank holds the funds')">
+          <input type="checkbox"><label>Knowing exactly which bank holds the funds</label>
+        </div>
+        <div class="opt" onclick="multipick(this,'q7','Seeing reviews from people who\'ve used it')">
+          <input type="checkbox"><label>Seeing reviews from people who've used it</label>
+        </div>
+        <div class="opt" onclick="multipick(this,'q7','It being recommended by a trusted estate agent')">
+          <input type="checkbox"><label>It being recommended by a trusted estate agent</label>
+        </div>
+        <div class="opt" onclick="multipick(this,'q7','A well-known law firm being publicly attached to it')">
+          <input type="checkbox"><label>A well-known law firm being publicly attached to it</label>
+        </div>
+        <div class="opt" onclick="multipick(this,'q7','Government or CBN recognition')">
+          <input type="checkbox"><label>Government or CBN recognition</label>
+        </div>
+        <div class="opt" onclick="multipick(this,'q7','Being able to see the full transaction process step by step')">
+          <input type="checkbox"><label>Being able to see the full transaction process step by step</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="step" id="s8">
+      <div class="section-badge">Open feedback</div>
+      <p class="q-title">Is there anything about this idea that you think won't work, or something important we're missing?</p>
+      <p class="q-sub">Be honest — this helps more than being kind.</p>
+      <textarea id="q8" placeholder="Share your thoughts here..."></textarea>
+    </div>
+
+    <!-- Q9 -->
+    <div class="step" id="s9">
+      <div class="section-badge">Final take</div>
+      <p class="q-title">If this platform launched tomorrow and had good reviews, how likely are you to recommend it to a friend or family member buying property?</p>
+      <div class="scale-grid" id="q9scale"></div>
+      <div class="scale-labels"><span>Would not recommend</span><span>Definitely would</span></div>
+    </div>
+
+    <!-- Done -->
+    <div class="step" id="sdone">
+      <div class="done-screen">
+        <div class="done-icon">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2>Thank you!</h2>
+        <p>Your responses have been recorded below. Please copy and send them to the PropTrust team.</p>
+
+        <div class="results-card">
+          <div class="results-title">Your responses — PropTrust survey</div>
+          <div id="summary-rows"></div>
+        </div>
+
+        <button class="copy-btn" onclick="copyResults()">📋 Copy results</button>
+        <button class="restart-btn" onclick="restart()">Start over</button>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <div class="nav" id="nav-bar">
+      <div class="nav-inner">
+        <button class="btn-back" id="backBtn" onclick="goBack()">← Back</button>
+        <span class="step-indicator" id="stepCount">1 of 9</span>
+        <button class="btn-next" id="nextBtn" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const TOTAL = 9;
+  let cur = 1;
+  const answers = {};
+  const multiAnswers = {};
+
+  function startSurvey() {
+    document.getElementById('intro-screen').style.display = 'none';
+    document.getElementById('survey-screen').style.display = 'block';
+    buildScales();
+    updateUI();
+  }
+
+  function buildScales() {
+    ['q2scale','q4scale','q9scale'].forEach((id, i) => {
+      const qKey = ['q2','q4','q9'][i];
+      const el = document.getElementById(id);
+      for (let n = 1; n <= 10; n++) {
+        const b = document.createElement('button');
+        b.className = 'scale-btn';
+        b.textContent = n;
+        b.dataset.val = n;
+        b.dataset.q = qKey;
+        b.onclick = function() {
+          el.querySelectorAll('.scale-btn').forEach(x => x.classList.remove('selected'));
+          this.classList.add('selected');
+          answers[qKey] = parseInt(this.dataset.val);
+        };
+        el.appendChild(b);
+      }
+    });
+  }
+
+  function pick(el, q, val) {
+    el.closest('.options').querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+    answers[q] = val;
+  }
+
+  function multipick(el, q, val) {
+    el.classList.toggle('selected');
+    const cb = el.querySelector('input[type=checkbox]');
+    cb.checked = !cb.checked;
+    if (!multiAnswers[q]) multiAnswers[q] = [];
+    if (cb.checked) {
+      if (!multiAnswers[q].includes(val)) multiAnswers[q].push(val);
+    } else {
+      multiAnswers[q] = multiAnswers[q].filter(v => v !== val);
+    }
+  }
+
+  function updateUI() {
+    const pct = ((cur - 1) / TOTAL) * 100;
+    document.getElementById('prog').style.width = pct + '%';
+    document.getElementById('stepCount').textContent = cur <= TOTAL ? cur + ' of ' + TOTAL : '';
+    document.getElementById('backBtn').style.visibility = cur > 1 ? 'visible' : 'hidden';
+    const nb = document.getElementById('nextBtn');
+    nb.textContent = cur === TOTAL ? 'Finish ✓' : 'Next →';
+  }
+
+  function showStep(n) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    if (n <= TOTAL) {
+      document.getElementById('s' + n).classList.add('active');
+      document.getElementById('nav-bar').style.display = 'block';
+    } else {
+      document.getElementById('sdone').classList.add('active');
+      document.getElementById('nav-bar').style.display = 'none';
+      buildSummary();
+    }
+    updateUI();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goNext() {
+    if (cur === 8) {
+      answers['q8'] = document.getElementById('q8').value.trim() || '(no comment)';
+    }
+    cur++;
+    showStep(cur);
+  }
+
+  function goBack() {
+    if (cur > 1) { cur--; showStep(cur); }
+  }
+
+  function buildSummary() {
+    const rows = [
+      { label: 'Property experience', val: answers['q1'] || '—' },
+      { label: 'Worry about fraud (1–10)', val: answers['q2'] ? answers['q2'] + ' / 10' : '—', score: true },
+      { label: 'Personal exposure to fraud', val: answers['q3'] || '—' },
+      { label: 'Concept usefulness (1–10)', val: answers['q4'] ? answers['q4'] + ' / 10' : '—', score: true },
+      { label: 'Barriers to adoption', val: multiAnswers['q5'] || [], multi: true },
+      { label: 'Willingness to pay', val: answers['q6'] || '—' },
+      { label: 'Top trust signals', val: multiAnswers['q7'] || [], multi: true },
+      { label: 'Open feedback', val: answers['q8'] || '—' },
+      { label: 'Likelihood to recommend (1–10)', val: answers['q9'] ? answers['q9'] + ' / 10' : '—', score: true },
+    ];
+
+    const container = document.getElementById('summary-rows');
+    container.innerHTML = rows.map(r => {
+      let valHtml;
+      if (r.multi && Array.isArray(r.val) && r.val.length) {
+        valHtml = r.val.map(v => `<span class="tag">${v}</span>`).join('');
+      } else if (r.score) {
+        valHtml = `<span class="score-big">${r.val}</span>`;
+      } else {
+        valHtml = `<span>${Array.isArray(r.val) && !r.val.length ? '—' : r.val}</span>`;
+      }
+      return `<div class="result-row"><div class="result-label">${r.label}</div><div class="result-val">${valHtml}</div></div>`;
+    }).join('');
+  }
+
+  function copyResults() {
+    const timestamp = new Date().toLocaleString('en-NG', { dateStyle: 'medium', timeStyle: 'short' });
+    const lines = [
+      'PROPTRUST VALIDATION SURVEY RESULTS',
+      '====================================',
+      `Date: ${timestamp}`,
+      '',
+      `Property experience: ${answers['q1'] || '—'}`,
+      `Worry about fraud (1–10): ${answers['q2'] || '—'}`,
+      `Personal exposure to fraud: ${answers['q3'] || '—'}`,
+      `Concept usefulness (1–10): ${answers['q4'] || '—'}`,
+      `Barriers to adoption: ${(multiAnswers['q5'] || []).join(', ') || '—'}`,
+      `Willingness to pay: ${answers['q6'] || '—'}`,
+      `Top trust signals: ${(multiAnswers['q7'] || []).join(', ') || '—'}`,
+      `Open feedback: ${answers['q8'] || '—'}`,
+      `Likelihood to recommend (1–10): ${answers['q9'] || '—'}`,
+    ];
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+      const b = document.querySelector('.copy-btn');
+      const orig = b.textContent;
+      b.textContent = '✓ Copied to clipboard!';
+      setTimeout(() => { b.textContent = orig; }, 2500);
+    });
+  }
+
+  function restart() {
+    Object.keys(answers).forEach(k => delete answers[k]);
+    Object.keys(multiAnswers).forEach(k => delete multiAnswers[k]);
+    document.querySelectorAll('.opt').forEach(o => {
+      o.classList.remove('selected');
+      const inp = o.querySelector('input');
+      if (inp) inp.checked = false;
+    });
+    document.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('q8').value = '';
+    cur = 1;
+    showStep(1);
+  }
+</script>
+</body>
+</html>
